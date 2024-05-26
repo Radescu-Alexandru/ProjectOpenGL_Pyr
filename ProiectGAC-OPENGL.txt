@@ -1,0 +1,102 @@
+#include<Windows.h>
+#include<GL/gl.h>
+#include<GL/glut.h>
+static int width = 1200;
+static int height = 720;
+float angle = 0;
+void display(void) {
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+
+	gluLookAt(1, 2, 6,
+		0, 0, 0,
+		0, 1, 0);
+	//Piramida
+	glRotatef(angle, 0, 1, 0);//axa y
+	glBegin(GL_TRIANGLES);
+	glColor3f(1, 0, 0);
+	//I face
+	glVertex3f(0, 1, 0);
+	glVertex3f(-1, -1, 1);
+	glVertex3f(1, -1, 1);
+
+	//fata din dreapta
+	glColor3f(0, 0, 1);
+	glVertex3f(0, 1, 0);
+	glVertex3f(1, -1, 1);
+	glVertex3f(1, -1, -1);
+
+	//fata din spate
+	glColor3f(0, 1, 0);
+	glVertex3f(0, 1, 0);
+	glVertex3f(1, -1, -1);
+	glVertex3f(-1, -1, -1);
+	//fata din stanga
+	glColor3f(1, 1, 0);
+	glVertex3f(0, 1, 0);
+	glVertex3f(-1, -1, -1);
+	glVertex3f(-1, -1, 1);
+	glEnd();
+	//sfera
+	glTranslatef(0, 1.5, 0);
+	glColor3f(0, 1, 1);
+	glRotatef(-angle, 0, 1, 0);
+	glutSolidSphere(0.5, 20, 20);
+
+	//cuboid
+	glTranslatef(0, 0, 0);
+	glColor3f(1, 0, 1);
+	glRotatef(-angle, 0, 1, 0);
+	glScalef(2, 1, 0.5); 
+
+	glutSolidCube(1);
+
+	glFlush();
+	glutSwapBuffers();
+}
+void spinPiramida(int val)
+{
+	angle = angle + 0.5;
+
+	glutPostRedisplay();
+	glutTimerFunc(10, spinPiramida, 0);
+}
+void mouse(int button, int state, int x, int y)
+{
+	switch (button) {
+	case GLUT_LEFT_BUTTON:
+		if (state == GLUT_DOWN)
+			glutTimerFunc(0, spinPiramida,0 );
+		break;
+	default:
+		break;
+	}
+}
+
+void reform(int width, int height)
+{
+
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0, (float)width / (float)height, 1.0, 100.0);
+	glMatrixMode(GL_MODELVIEW);
+
+}
+int main(int argc, char** argv)
+{
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA);
+	glutInitWindowSize(width, height);
+	glutCreateWindow("Proiect GAC");
+	glutDisplayFunc(display);
+	glutMouseFunc(mouse);
+	glutReshapeFunc(reform);
+	glEnable(GL_DEPTH_TEST);
+	glutTimerFunc(10, spinPiramida, 0);
+	glutMainLoop();
+	return 0;
+
+
+}
